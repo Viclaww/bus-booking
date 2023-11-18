@@ -1,28 +1,34 @@
-import React from "react";
-
+import React, { useState } from "react";
+import { localGovernments } from "./localGovement";
 const Booker = () => {
-  const localGovernments = [
-    "Lagos Mainland",
-    "Abuja Municipal",
-    "Port Harcourt",
-    "Ikeja",
-    "Kano Municipal",
-    "Enugu North",
-    "Benin City",
-    "Abeokuta South",
-    "Ibadan North",
-    "Jos North",
-    "Maiduguri",
-    "Calabar Municipal",
-    "Uyo",
-    "Owerri Municipal",
-    "Kaduna North",
-    "Warri South",
-    "Onitsha North",
-    "Eket",
-    "Osogbo",
-    "Katsina",
-  ];
+  const [fromCity, setFromCity] = useState("");
+  const [toCity, setToCity] = useState("");
+
+  const handleFromChange = (event) => {
+    setFromCity(event.target.value);
+  };
+
+  const handleToChange = (event) => {
+    setToCity(event.target.value);
+  };
+
+  const handleSearchBus = () => {
+    if (fromCity === "" || toCity === "") {
+      alert("Please select both 'Traveling From' and 'Traveling To' cities.");
+      return;
+    }
+
+    if (fromCity === toCity) {
+      alert(
+        "Please select different cities for 'Traveling From' and 'Traveling To'."
+      );
+      return;
+    }
+
+    // Perform search bus logic here
+    console.log("Search Bus from", fromCity, "to", toCity);
+  };
+  const currentDate = new Date().toISOString().split("T")[0];
 
   return (
     <div>
@@ -33,6 +39,7 @@ const Booker = () => {
           <select
             className="border-[1px] p-1 w-[250px] h-[50px] rounded-lg border-black"
             defaultValue=""
+            onChange={handleFromChange}
           >
             <option value="" disabled hidden>
               Select City
@@ -47,6 +54,7 @@ const Booker = () => {
           <select
             className="border-[1px] p-1 w-[250px] h-[50px] rounded-lg border-black"
             defaultValue=""
+            onChange={handleToChange}
           >
             <option value="" disabled hidden>
               Select Destination
@@ -60,9 +68,13 @@ const Booker = () => {
           <p>Travel Date</p>
           <input
             type="date"
+            defaultValue={currentDate}
             className="border-[1px] p-1 w-[250px] h-[40px] rounded-lg border-black"
           />
-          <button className="p-1 text-white bg-slate-900 w-[250px] h-[40px] mt-3 ">
+          <button
+            className="p-1 text-white bg-slate-900 w-[250px] h-[40px] mt-3"
+            onClick={handleSearchBus}
+          >
             Search Bus
           </button>
         </div>

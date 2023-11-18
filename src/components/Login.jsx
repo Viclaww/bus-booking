@@ -34,7 +34,7 @@ const Login = () => {
 
   useEffect(() => {
     if (user && !loading) {
-      navigate("/");
+      navigate("/dashboard");
     }
   }, [user, loading, navigate]);
   return (

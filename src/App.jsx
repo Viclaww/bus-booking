@@ -6,9 +6,11 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Auth from "./screens/auth";
 import Register from "./components/Register";
 import Login from "./components/login";
+import AdminDashboard from "./screens/AdminDashboard";
 
 function App() {
   const { user, loading } = useSelector((state) => state.auth);
+
   const navigate = useNavigate();
   useEffect(() => {
     if (!loading && !user) {
@@ -21,7 +23,13 @@ function App() {
     <>
       <Header />
       <Routes>
-        <Route exact path="/" element={<UserBooking />} />
+        <Route
+          exact
+          path="/dashboard"
+          element={
+            user && user.role === "admin" ? <AdminDashboard /> : <UserBooking />
+          }
+        />
         <Route exact path="auth" element={<Auth />}>
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />

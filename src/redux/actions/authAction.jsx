@@ -1,5 +1,5 @@
 import { auth, db } from "../../firebase";
-import { setDoc, doc } from "firebase/firestore";
+import { setDoc, getDoc, doc } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -19,21 +19,24 @@ const setLoading = (isLoading) => ({
 export const register = (name, email, phone, password) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
+
+    // Declare userCredential and userDocRef
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
+    const userDocRef = doc(db, "users", userCredential.user.uid);
 
     await signInWithEmailAndPassword(auth, email, password);
-    const userDocRef = doc(db, "users", userCredential.user.uid);
 
     const user = {
       name,
-      email: userCredential.user.email, // Access the user's email from userCredential.user
+      email: userCredential.user.email,
       phone,
       role: "user",
     };
+
     await setDoc(userDocRef, { user });
 
     sessionStorage.setItem("bb-user", JSON.stringify(user));
@@ -53,8 +56,6 @@ export const register = (name, email, phone, password) => async (dispatch) => {
     dispatch(setLoading(false));
   }
 };
-
-// Login action
 export const login = (email, password) => async (dispatch) => {
   try {
     dispatch(setLoading(true));
@@ -63,10 +64,12 @@ export const login = (email, password) => async (dispatch) => {
       email,
       password
     );
-
+    const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
     const user = {
       email: userCredential.user.email,
+      role: userDoc.data().user.role, // Access the 'role' field from the userDoc data
     };
+    console.log(user);
     sessionStorage.setItem("bb-user", JSON.stringify(user));
     console.log("Login successful:", userCredential);
 
