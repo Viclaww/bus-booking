@@ -1,5 +1,7 @@
 import { auth, db } from "../../firebase";
 import { setDoc, getDoc, doc } from "firebase/firestore";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -46,11 +48,11 @@ export const register = (name, email, phone, password) => async (dispatch) => {
       phoneNumber: phone,
     });
 
-    console.log("Registration successful:", userCredential);
-
+    toast.success("Registration successful!");
     dispatch({ type: REGISTER_SUCCESS, payload: user });
   } catch (error) {
     console.log(error);
+    toast.error(`Registration failed: ${error.message}`);
     // Handle registration error here
   } finally {
     dispatch(setLoading(false));
@@ -69,12 +71,13 @@ export const login = (email, password) => async (dispatch) => {
       email: userCredential.user.email,
       role: userDoc.data().user.role, // Access the 'role' field from the userDoc data
     };
-    console.log(user);
+
     sessionStorage.setItem("bb-user", JSON.stringify(user));
     console.log("Login successful:", userCredential);
-
+    toast.success("Login successful!");
     dispatch({ type: LOGIN_SUCCESS, payload: user });
   } catch (error) {
+    toast.error(`Login failed: ${error.message}`);
     console.error("Login error:", error.code, error.message);
   } finally {
     dispatch(setLoading(false));
@@ -85,6 +88,7 @@ export const logout = () => async (dispatch) => {
   auth
     .signOut()
     .then(() => {
+      toast.success("Logged Out Successfully");
       dispatch({ type: LOGOUT });
     })
     .catch((error) => {

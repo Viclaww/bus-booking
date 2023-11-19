@@ -40,7 +40,7 @@ const Register = () => {
     <>
       <form
         onSubmit={handleRegister}
-        className="justify-between p-5 top-[30%] w-[360px] shadow-xl mx-auto items-center  flex flex-col"
+        className="justify-between bg-yellow-700 my-3 p-5 top-[30%] w-[360px] shadow-xl mx-auto items-center  flex flex-col"
       >
         <input
           type="Name"

@@ -32,7 +32,7 @@ const Booker = () => {
 
   return (
     <div>
-      <form className="h-[90vh] flex w-full place-items-center ">
+      <form className="h-[70vh] flex w-full place-items-center ">
         <div className="justify-center items-center text-left h-auto p-5 bg-blue-500 w-[360px] shadow-xl mx-auto flex flex-col">
           <h4 className="text-xl font-bold">Book Seat</h4>
           <p>Traveling From:</p>

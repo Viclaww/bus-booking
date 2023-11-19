@@ -10,7 +10,25 @@
 @layer components {
   body {
     @apply bg-center bg-fixed;
+
     background-size: cover;
+  }
+  .loader {
+    border: 16px solid #234522;
+    border-top: 16px solid #101523; /* Blue */
+    border-radius: 50%;
+    width: 105px;
+    height: 105px;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
   }
   .auth-button {
     @apply bg-black w-[250px] h-[40px] text-white;
@@ -18,7 +36,7 @@
   .auth-links a {
     @apply p-2 text-slate-600;
   }
-  .auth-links .active-link {
+  .auth-links a:active {
     @apply p-2 text-white bg-black;
   }
 }

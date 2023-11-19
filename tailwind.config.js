@@ -3,7 +3,9 @@ export default {
   content: ["./src/**/*.{html,jsx}"],
   theme: {
     extend: {
-      backgroundImage: {},
+      fontFamily: {
+        Grotesk: ["Space Grotesk", "sans-serif"],
+      },
     },
   },
   plugins: [],

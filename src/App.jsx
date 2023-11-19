@@ -7,6 +7,8 @@ import Auth from "./screens/auth";
 import Register from "./components/Register";
 import Login from "./components/login";
 import AdminDashboard from "./screens/AdminDashboard";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { user, loading } = useSelector((state) => state.auth);
@@ -22,6 +24,7 @@ function App() {
   return (
     <>
       <Header />
+      <ToastContainer />
       <Routes>
         <Route
           exact

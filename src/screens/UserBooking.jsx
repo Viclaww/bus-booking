@@ -1,10 +1,12 @@
 import React from "react";
 import Booker from "../components/booker";
+import AvailableTransits from "../components/availableTransits";
 
 const UserBooking = () => {
   return (
     <>
       <Booker />
+      <AvailableTransits />
     </>
   );
 };

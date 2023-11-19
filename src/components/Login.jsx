@@ -41,7 +41,7 @@ const Login = () => {
     <>
       <form
         onSubmit={handleLogin}
-        className="justify-between  left-[35%]  p-5 top-[30%] w-[360px] shadow-xl mx-auto items-center  flex flex-col"
+        className="justify-between bg-yellow-700 my-3 left-[35%]  p-5 top-[30%] w-[360px] shadow-xl mx-auto items-center  flex flex-col"
       >
         <input
           id="email"
@@ -60,7 +60,7 @@ const Login = () => {
         />
 
         <button className="auth-button">
-          {loading ? "Loading...." : "Login"}
+          {loading ? "Loading..." : "Login"}
         </button>
       </form>
     </>
