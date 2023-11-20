@@ -1,4 +1,4 @@
-import Header from "./components/header";
+import Header from "./components/Header";
 import { useEffect } from "react";
 import UserBooking from "./screens/UserBooking";
 import { useSelector } from "react-redux";
