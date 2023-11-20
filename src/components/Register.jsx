@@ -25,7 +25,7 @@ const Register = () => {
   const { user, loading } = useSelector((state) => state.auth || {});
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate("/dashboard");
     }
     return () => {
       setFormData({

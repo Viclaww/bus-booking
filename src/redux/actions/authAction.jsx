@@ -37,6 +37,7 @@ export const register = (name, email, phone, password) => async (dispatch) => {
       email: userCredential.user.email,
       phone,
       role: "user",
+      uid: userCredential.user.uid,
     };
 
     await setDoc(userDocRef, { user });
@@ -70,10 +71,10 @@ export const login = (email, password) => async (dispatch) => {
     const user = {
       email: userCredential.user.email,
       role: userDoc.data().user.role, // Access the 'role' field from the userDoc data
+      uid: userCredential.user.uid,
     };
 
     sessionStorage.setItem("bb-user", JSON.stringify(user));
-    console.log("Login successful:", userCredential);
     toast.success("Login successful!");
     dispatch({ type: LOGIN_SUCCESS, payload: user });
   } catch (error) {

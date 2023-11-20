@@ -21,6 +21,16 @@ function App() {
       }
     }
   }, [user, loading, navigate]);
+
+  const ProtectedRoute = ({ element, user }) => {
+    if (!user) {
+      return navigate("/auth");
+    }
+
+    // Check user role and render the appropriate component
+    return user.role === "admin" ? <AdminDashboard /> : <UserBooking />;
+  };
+
   return (
     <>
       <Header />
@@ -29,9 +39,7 @@ function App() {
         <Route
           exact
           path="/dashboard"
-          element={
-            user && user.role === "admin" ? <AdminDashboard /> : <UserBooking />
-          }
+          element={<ProtectedRoute user={user} />}
         />
         <Route exact path="auth" element={<Auth />}>
           <Route path="register" element={<Register />} />

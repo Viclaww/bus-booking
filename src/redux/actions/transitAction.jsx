@@ -1,7 +1,9 @@
 import {
   ADD_TRANSIT_SUCCESS,
   REMOVE_TRANSIT,
-  BOOK_TRANSIT,
+  BOOK_TRANSIT_REQUEST,
+  BOOK_TRANSIT_SUCCESS,
+  BOOK_TRANSIT_FAILURE,
   FETCH_TRANSITS_REQUEST,
   FETCH_TRANSITS_SUCCESS,
   FETCH_TRANSITS_FAILURE,
@@ -23,14 +25,18 @@ export const addTransit = (transitData) => async (dispatch) => {
     const transitRef = await addDoc(collection(db, "transits"), transitData);
 
     // Check if transitRef.id exists before using it
-    const newTransit = { id: transitRef.id, ...transitData };
+    if (transitRef.id) {
+      const newTransit = { ...transitData, id: transitRef.id };
 
-    dispatch({
-      type: ADD_TRANSIT_SUCCESS,
-      payload: newTransit,
-    });
+      dispatch({
+        type: ADD_TRANSIT_SUCCESS,
+        payload: newTransit,
+      });
 
-    toast.success("Transit Added");
+      toast.success("Transit Added");
+    } else {
+      toast.error("Error adding transit to Firestore: No document ID");
+    }
   } catch (error) {
     toast.error("Error adding transit to Firestore:", error);
   }
@@ -58,7 +64,10 @@ export const fetchTransits = () => async (dispatch) => {
     let transits = [];
 
     if (!transitSnapshot.empty) {
-      transits = transitSnapshot.docs.map((doc) => doc.data());
+      transits = transitSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
     }
 
     dispatch(fetchTransitsSuccess(transits));
@@ -70,7 +79,6 @@ export const fetchTransits = () => async (dispatch) => {
 
 export const removeTransit = (transitId) => async (dispatch) => {
   try {
-    console.log("Removing transit with ID:", transitId); // Add this line
     await deleteDoc(doc(db, "transits", transitId));
     dispatch({
       type: REMOVE_TRANSIT,
@@ -82,17 +90,34 @@ export const removeTransit = (transitId) => async (dispatch) => {
   }
 };
 
+const bookTransitRequest = () => ({
+  type: BOOK_TRANSIT_REQUEST,
+});
+
+const bookTransitSuccess = (transitId, userId) => ({
+  type: BOOK_TRANSIT_SUCCESS,
+  payload: { transitId, userId },
+});
+
+const bookTransitFailure = (error) => ({
+  type: BOOK_TRANSIT_FAILURE,
+  payload: error,
+});
+
 export const bookTransit = (transitId, userId) => async (dispatch) => {
+  dispatch(bookTransitRequest());
+
   try {
     const transitDocRef = doc(db, "transits", transitId);
     await updateDoc(transitDocRef, {
       bookedBy: arrayUnion(userId),
     });
-    dispatch({
-      type: BOOK_TRANSIT,
-      payload: { transitId, userId },
-    });
+
+    dispatch(bookTransitSuccess(transitId, userId));
+    toast.success("Transit Booked");
   } catch (error) {
-    console.error("Error updating transit in Firestore:", error);
+    toast.error("Error booking transit:", error);
+    console.error("Error booking transit:", error);
+    dispatch(bookTransitFailure(error));
   }
 };
