@@ -1,8 +1,15 @@
 import React, { useState } from "react";
 import { localGovernments } from "./localGovement";
+import { searchTransits } from "../redux/actions/transitAction";
+import { useDispatch, useSelector } from "react-redux";
 const Booker = () => {
   const [fromCity, setFromCity] = useState("");
   const [toCity, setToCity] = useState("");
+  const dispatch = useDispatch();
+  const [searchClicked, setSearchClicked] = useState(false);
+  const { isSearching, searchResults, searchError } = useSelector(
+    (state) => state.transitReducer
+  );
 
   const handleFromChange = (event) => {
     setFromCity(event.target.value);
@@ -12,7 +19,8 @@ const Booker = () => {
     setToCity(event.target.value);
   };
 
-  const handleSearchBus = () => {
+  const handleSearchBus = (e) => {
+    e.preventDefault();
     if (fromCity === "" || toCity === "") {
       alert("Please select both 'Traveling From' and 'Traveling To' cities.");
       return;
@@ -25,8 +33,9 @@ const Booker = () => {
       return;
     }
 
-    // Perform search bus logic here
+    dispatch(searchTransits(fromCity, toCity));
     console.log("Search Bus from", fromCity, "to", toCity);
+    setSearchClicked(true);
   };
   const currentDate = new Date().toISOString().split("T")[0];
 
@@ -65,12 +74,7 @@ const Booker = () => {
               </option>
             ))}
           </select>
-          <p>Travel Date</p>
-          <input
-            type="date"
-            defaultValue={currentDate}
-            className="border-[1px] p-1 w-[250px] h-[40px] rounded-lg border-black"
-          />
+
           <button
             className="p-1 text-white bg-slate-900 w-[250px] h-[40px] mt-3"
             onClick={handleSearchBus}

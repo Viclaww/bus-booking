@@ -104,9 +104,7 @@ const CreateTransit = () => {
           defaultValue=""
           onChange={handleCapacity}
         >
-          <option>10</option>
           <option>15</option>
-          <option>20</option>
           <option>30</option>
         </select>
 

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchTransits,
@@ -6,14 +6,20 @@ import {
   bookTransit,
 } from "../redux/actions/transitAction";
 import travel from "../assets/travel.jpg";
+import BookingModal from "./BookingModal";
 
 const AvailableTransits = () => {
   const dispatch = useDispatch();
   const userId = useSelector((state) => state.auth.user.uid);
   const transits = useSelector((state) => state.transitReducer.transits);
   const isLoading = useSelector((state) => state.transitReducer.isLoading);
+  const error = useSelector((state) => state.transitReducer.error);
   const role = useSelector((state) => state.auth.user.role);
   const isBooking = useSelector((state) => state.transitReducer.isBooking);
+
+  const [selectedTransit, setSelectedTransit] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   useEffect(() => {
     // Fetch transits when the component mounts
     dispatch(fetchTransits());
@@ -21,15 +27,17 @@ const AvailableTransits = () => {
 
   const handleBookTransit = (e) => {
     const transitId = e.target.id;
-    if (userId && transitId) {
-      dispatch(bookTransit(transitId, userId));
-    } else {
-      console.error("Invalid userId or transitId");
-    }
+    const selected = transits.find((transit) => transit.id === transitId);
+    setSelectedTransit(selected);
+    setIsModalOpen(true);
   };
   const handleCancelTransit = (e) => {
     const transitId = e.target.id;
     dispatch(removeTransit(transitId));
+  };
+  const handleBookSeat = (seatNumber) => {
+    dispatch(bookTransit(selectedTransit.id, userId, seatNumber));
+    setIsModalOpen(false);
   };
 
   return (
@@ -41,7 +49,19 @@ const AvailableTransits = () => {
       }
     >
       <h2 className="text-3xl font-bold mb-10">Available Transits</h2>
-      {isLoading ? <div className="loader"></div> : ""}
+      {isLoading ? (
+        <div className="flex flex-col w-full justify-center items-center">
+          <div className="loader"></div>
+          <h1 className="text-3xl font-bold my-10">
+            Please Wait.... We are getting your Available Transits😉
+          </h1>
+        </div>
+      ) : error ? (
+        <div className="text-red-500 text-center">
+          An error occurred while fetching transits. Please check Internet
+          connnection😔
+        </div>
+      ) : null}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 relative">
         {transits.map((transit) => (
@@ -50,11 +70,10 @@ const AvailableTransits = () => {
             key={transit.id}
           >
             <img src={travel} alt="" />
-            <p className="text-center sm:text-sm lg:text-xl font-bold">
-              {transit.From} <span className="text-lg font-light">To</span>{" "}
-              {transit.To}
+            <p className="text-center text-sm  font-bold">
+              {transit.From} <span className="font-light">To</span> {transit.To}
             </p>
-            <p className="absolute bg-black bg-opacity-40 top-24 left-3 p-1 rounded-lg">
+            <p className="absolute bg-black bg-opacity-40 top-[7.1rem] left-3 p-1 rounded-lg">
               <span className="line-through">N</span>
               {transit.Price}
             </p>
@@ -84,6 +103,14 @@ const AvailableTransits = () => {
           </div>
         ))}
       </div>
+      <BookingModal
+        open={isModalOpen}
+        handleClose={() => setIsModalOpen(false)}
+        capacity={selectedTransit?.Capacity}
+        from={selectedTransit?.From}
+        to={selectedTransit?.To}
+        handleBook={handleBookSeat}
+      />
     </div>
   );
 };

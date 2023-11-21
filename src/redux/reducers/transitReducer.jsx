@@ -3,9 +3,13 @@ import {
   BOOK_TRANSIT_SUCCESS,
   BOOK_TRANSIT_FAILURE,
   REMOVE_TRANSIT,
+  SEARCH_TRANSITS_REQUEST,
+  SEARCH_TRANSITS_SUCCESS,
+  SEARCH_TRANSITS_FAILURE,
   FETCH_TRANSITS_FAILURE,
   FETCH_TRANSITS_SUCCESS,
   FETCH_TRANSITS_REQUEST,
+  SEARCH_CLICKED,
 } from "../actionTypes";
 
 const initialState = {
@@ -14,6 +18,10 @@ const initialState = {
   error: null,
   isBooking: false,
   bookingError: null,
+  searchResults: [],
+  isSearching: false,
+  searchError: null,
+  searchClicked: false,
 };
 
 const transitReducer = (state = initialState, action) => {
@@ -93,6 +101,32 @@ const transitReducer = (state = initialState, action) => {
         bookingError: action.payload,
       };
 
+    case SEARCH_TRANSITS_REQUEST:
+      return {
+        ...state,
+        isSearching: true,
+        searchResults: [],
+        searchError: null,
+      };
+    case SEARCH_TRANSITS_SUCCESS:
+      return {
+        ...state,
+        searchResults: action.payload,
+        isSearching: false,
+        searchError: null,
+      };
+
+    case SEARCH_TRANSITS_FAILURE:
+      return {
+        ...state,
+        isSearching: false,
+        searchError: action.payload,
+      };
+    case SEARCH_CLICKED:
+      return {
+        ...state,
+        searchClicked: true,
+      };
     default:
       return state;
   }
