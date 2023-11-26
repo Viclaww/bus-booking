@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <>
       <div className=" header px-10 flex justify-between items-center p-2 box-border bg-black w-full h-16">
-        <h2 className="text-3xl font-bold  text-white">Roady Trip</h2>
+        <h2 className="text-3xl font-bold  text-white">Chisco Transportation Comapany</h2>
         {user ? (
           <div className="flex w-1/6 justify-between">
             <button onClick={handleLogout} className="text-white">
