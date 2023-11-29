@@ -12,7 +12,11 @@ const Header = () => {
   return (
     <>
       <div className=" header px-10 flex justify-between items-center p-2 box-border bg-black w-full h-16">
+<<<<<<< HEAD
         <h2 className="text-3xl font-bold  text-white">Road Trip</h2>
+=======
+
+>>>>>>> d9141c337d92cc4cfd63da1d1e0c71d2f243388a
         {user ? (
           <div className="flex w-1/6 justify-between">
             <Link to="/booked-Transits" className="text-white p-2">
