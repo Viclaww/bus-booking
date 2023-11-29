@@ -9,6 +9,7 @@ import Login from "./components/Login";
 import AdminDashboard from "./screens/AdminDashboard";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import BookedTransits from "./screens/Booked";
 
 function App() {
   const { user, loading } = useSelector((state) => state.auth);
@@ -41,6 +42,7 @@ function App() {
           path="/dashboard"
           element={<ProtectedRoute user={user} />}
         />
+        <Route path="/booked-transits" element={<BookedTransits />} />
         <Route exact path="auth" element={<Auth />}>
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />

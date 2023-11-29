@@ -10,8 +10,12 @@ import {
   SEARCH_TRANSITS_REQUEST,
   SEARCH_TRANSITS_SUCCESS,
   SEARCH_TRANSITS_FAILURE,
+  FETCH_BOOKED_SEATS_REQUEST,
+  FETCH_BOOKED_SEATS_SUCCESS,
+  FETCH_BOOKED_SEATS_FAILURE,
   SEARCH_CLICKED,
 } from "../actionTypes";
+import { v4 as uuidv4 } from "uuid";
 import { db } from "../../firebase";
 import {
   collection,
@@ -20,6 +24,7 @@ import {
   query,
   where,
   updateDoc,
+  getDoc,
   getDocs,
   deleteDoc,
   arrayUnion,
@@ -28,11 +33,21 @@ import { toast } from "react-toastify";
 
 export const addTransit = (transitData) => async (dispatch) => {
   try {
-    const transitRef = await addDoc(collection(db, "transits"), transitData);
+    const transitDataWithDefaults = {
+      ...transitData,
+      bookedSeats: [],
+      bookedBy: [],
+    };
+    const transitRef = await addDoc(
+      collection(db, "transits"),
+      transitDataWithDefaults
+    );
 
-    // Check if transitRef.id exists before using it
     if (transitRef.id) {
-      const newTransit = { ...transitData, id: transitRef.id };
+      const newTransit = {
+        ...transitDataWithDefaults,
+        id: transitRef.id,
+      };
 
       dispatch({
         type: ADD_TRANSIT_SUCCESS,
@@ -111,58 +126,102 @@ const bookTransitFailure = (error) => ({
   payload: error,
 });
 
-// transitAction.jsx
-
 export const bookTransit =
-  (transitId, userId, selectedSeat) => async (dispatch, getState) => {
-    dispatch({ type: BOOK_TRANSIT_REQUEST });
-
+  (transitId, userId, selectedSeat) => async (dispatch) => {
     try {
-      const state = getState();
-      const { transits } = state.transitReducer;
-      const transitToUpdate = transits.find(
-        (transit) => transit.id === transitId
-      );
+      const transitDocRef = doc(db, "transits", transitId);
 
-      if (!transitToUpdate) {
-        throw new Error("Transit not found");
+      // Get the current transit data
+      const transitDocSnapshot = await getDoc(transitDocRef);
+      const transitData = transitDocSnapshot.data();
+
+      // Check if bookedBy is an array and contains the userId
+      if (transitData.bookedBy.some((booking) => booking.userId === userId)) {
+        toast.error("You have already booked a seat in this transit.");
+        console.error("User has already booked a seat in this transit.");
+        return;
       }
 
-      // Check if the selected seat is available
-      if (transitToUpdate.bookedSeats.includes(selectedSeat)) {
-        throw new Error("Seat is already booked");
+      if (transitData.bookedSeats.includes(selectedSeat)) {
+        toast.error("Seat is already taken. Please choose another seat.");
+        console.error("Seat is already taken. Please choose another seat.");
+        return;
       }
 
-      // Check if transit has reached capacity
-      if (transitToUpdate.bookedSeats.length >= transitToUpdate.capacity) {
-        throw new Error("Transit is fully booked");
+      // Check if the transit is at full capacity
+      if (transitData.bookedBy.length >= transitData.Capacity) {
+        toast.error("Transit booked to full capacity");
+        console.error("Transit is at full capacity. Cannot book more seats.");
+        return;
       }
 
-      // Update transit data
-      const updatedTransit = {
-        ...transitToUpdate,
-        bookedSeats: [...transitToUpdate.bookedSeats, selectedSeat],
-        bookedBy: [...transitToUpdate.bookedBy, { userId, seat: selectedSeat }],
-      };
+      const ticketId = uuidv4();
 
-      // Perform the update in Firestore or your preferred backend
-      // ...
+      // Update the bookedBy field to include the userId
+      const updatedBookedBy = [
+        ...transitData.bookedBy,
+        { userId, selectedSeat, ticketId },
+      ];
 
-      dispatch({
-        type: BOOK_TRANSIT_SUCCESS,
-        payload: { transitId, updatedTransit },
+      // Update the bookedSeats array to include the selected seat
+      const updatedBookedSeats = [...transitData.bookedSeats, selectedSeat];
+
+      // Update the transit document
+      await updateDoc(transitDocRef, {
+        bookedBy: updatedBookedBy,
+        bookedSeats: updatedBookedSeats,
       });
 
-      // Additional success actions
+      // Dispatch the success action
+      dispatch({
+        type: BOOK_TRANSIT_SUCCESS,
+        payload: { transitId, userId, selectedSeat },
+      });
+      toast.success("Transit booked successfully");
+      // Additional logic or dispatch actions can be added here if needed
     } catch (error) {
+      console.error("Book error", error.message);
       dispatch({
         type: BOOK_TRANSIT_FAILURE,
         payload: error.message,
       });
-
-      // Additional error handling
     }
   };
+
+export const fetchBookedSeats = (transitId) => async (dispatch) => {
+  dispatch(fetchBookedSeatsRequest());
+
+  try {
+    const transitDocRef = doc(db, "transits", transitId);
+
+    // Get the current transit data
+    const transitDocSnapshot = await getDoc(transitDocRef);
+
+    const transitData = transitDocSnapshot.data();
+
+    const bookedSeats = Array.isArray(transitData?.bookedSeats)
+      ? transitData.bookedSeats
+      : [];
+
+    dispatch(fetchBookedSeatsSuccess(bookedSeats));
+  } catch (error) {
+    console.error("Error fetching booked seats:", error);
+    dispatch(fetchBookedSeatsFailure());
+  }
+};
+
+const fetchBookedSeatsRequest = () => ({
+  type: FETCH_BOOKED_SEATS_REQUEST,
+});
+
+const fetchBookedSeatsSuccess = (bookedSeats) => ({
+  type: FETCH_BOOKED_SEATS_SUCCESS,
+  payload: bookedSeats,
+});
+
+const fetchBookedSeatsFailure = () => ({
+  type: FETCH_BOOKED_SEATS_FAILURE,
+});
 
 export const searchTransits = (fromCity, toCity) => async (dispatch) => {
   dispatch({ type: SEARCH_CLICKED });

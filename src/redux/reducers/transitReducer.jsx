@@ -9,6 +9,9 @@ import {
   FETCH_TRANSITS_FAILURE,
   FETCH_TRANSITS_SUCCESS,
   FETCH_TRANSITS_REQUEST,
+  FETCH_BOOKED_SEATS_REQUEST,
+  FETCH_BOOKED_SEATS_SUCCESS,
+  FETCH_BOOKED_SEATS_FAILURE,
   SEARCH_CLICKED,
 } from "../actionTypes";
 
@@ -22,6 +25,8 @@ const initialState = {
   isSearching: false,
   searchError: null,
   searchClicked: false,
+  bookedSeats: [],
+  bookedTransits: [],
 };
 
 const transitReducer = (state = initialState, action) => {
@@ -99,6 +104,28 @@ const transitReducer = (state = initialState, action) => {
         ...state,
         isBooking: false,
         bookingError: action.payload,
+      };
+
+    case FETCH_BOOKED_SEATS_REQUEST:
+      return {
+        ...state,
+        isLoading: true,
+        error: null,
+      };
+
+    case FETCH_BOOKED_SEATS_SUCCESS:
+      return {
+        ...state,
+        bookedSeats: action.payload,
+        isLoading: false,
+        error: null,
+      };
+
+    case FETCH_BOOKED_SEATS_FAILURE:
+      return {
+        ...state,
+        isLoading: false,
+        error: action.payload,
       };
 
     case SEARCH_TRANSITS_REQUEST:

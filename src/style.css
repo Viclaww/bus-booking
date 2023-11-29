@@ -39,4 +39,16 @@
   .auth-links a:active {
     @apply p-2 text-white bg-black;
   }
+  .seat {
+    background-color: black;
+    color: white;
+    margin: 5px;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .seat.selected {
+    background-color: blue;
+  }
 }

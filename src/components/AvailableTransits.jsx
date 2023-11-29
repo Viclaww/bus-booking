@@ -36,7 +36,7 @@ const AvailableTransits = () => {
     dispatch(removeTransit(transitId));
   };
   const handleBookSeat = (seatNumber) => {
-    dispatch(bookTransit(selectedTransit.id, userId, seatNumber));
+    // dispatch(bookTransit(selectedTransit.id, userId, seatNumber));
     setIsModalOpen(false);
   };
 
@@ -108,7 +108,9 @@ const AvailableTransits = () => {
         handleClose={() => setIsModalOpen(false)}
         capacity={selectedTransit?.Capacity}
         from={selectedTransit?.From}
+        transitId={selectedTransit?.id}
         to={selectedTransit?.To}
+        userId={userId}
         handleBook={handleBookSeat}
       />
     </div>

@@ -1,24 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Typography, Box } from "@mui/material";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { bookTransit, fetchBookedSeats } from "../redux/actions/transitAction";
 
-const BookingModal = ({
-  open,
-  handleClose,
-  capacity,
-  from,
-  to,
-  handleBook,
-}) => {
+const BookingModal = ({ open, handleClose, capacity, userId, transitId }) => {
   const [selectedSeat, setSelectedSeat] = useState(null);
+  const bookedSeats = useSelector((state) => state.transitReducer.bookedSeats);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchBookedSeats(transitId));
+  }, [dispatch, transitId]);
 
   const handleSeatSelection = (seat) => {
     setSelectedSeat(seat);
   };
 
+  const isSeatBooked = (seat) => {
+    return bookedSeats && bookedSeats.includes(seat);
+  };
   const handleBookNow = () => {
     if (selectedSeat !== null) {
-      handleBook(selectedSeat);
       handleClose();
+      dispatch(bookTransit(transitId, userId, selectedSeat));
     }
   };
 
@@ -30,8 +33,8 @@ const BookingModal = ({
         key={seat}
         onClick={() => handleSeatSelection(seat)}
         className={`seat p-2 bg-black m-2 text-white ${
-          selectedSeat === seat ? "selected" : ""
-        }`}
+          selectedSeat === seat ? "selected " : ""
+        }${isSeatBooked(seat) ? "booked text-blue-500 bg-white" : ""}`}
       >
         {seat}
       </button>
@@ -55,10 +58,16 @@ const BookingModal = ({
           p: 4,
         }}
       >
-        <Typography variant="h6" component="div">
-          Select a Seat
+        <Typography
+          variant="h6"
+          sx={{
+            fontWeight: "bold",
+          }}
+          component="div"
+        >
+          Select a Seat:
         </Typography>
-        <div className="seats-container">{renderSeats()}</div>
+        <div className="seats-container grid grid-cols-3 ">{renderSeats()}</div>
         <div className=" mt-3 flex justify-between w-full">
           <Button onClick={handleClose} variant="contained">
             Cancel
